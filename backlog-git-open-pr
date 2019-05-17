@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -eu
+
+REPO=$(git config --get remote.origin.url | sed 's/\.git$//g')
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+WORKDIR=$(git rev-parse --show-prefix | sed 's%\/$%%g')
+
+if ! echo $REPO | grep -E -q "backlog.jp:|backlog.jp:" ; then
+  exit 1
+fi
+
+if echo $REPO | grep -q "^http" ; then
+  # HTTP
+  BASEURL=$(echo $REPO | sed 's/\.git\./\./g')
+else
+  # SSH
+  DOMAIN=$(echo $REPO | awk -F'[@:]' '{print $2}' | sed 's/\.git\./\./g')
+  SUBDIR=$(echo $REPO | awk -F'[@:]' '{print $3}')
+  BASEURL=https://$DOMAIN/git$SUBDIR
+fi
+
+URL=$BASEURL/pullRequests/add/master...$BRANCH
+
+echo $URL
+open $URL
