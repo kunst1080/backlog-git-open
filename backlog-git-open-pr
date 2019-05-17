@@ -10,14 +10,15 @@ if ! echo $REPO | grep -E -q "backlog.(jp|com)(:|/)" ; then
   exit 1
 fi
 
-if echo $REPO | grep -q "^http" ; then
+if echo $REPO | grep -q "^https://" ; then
   # HTTP
   BASEURL=$(echo $REPO | sed 's/\.git\./\./g')
 else
   # SSH
-  DOMAIN=$(echo $REPO | awk -F'[@:]' '{print $2}' | sed 's/\.git\./\./g')
-  SUBDIR=$(echo $REPO | awk -F'[@:]' '{print $3}')
-  BASEURL=https://$DOMAIN/git$SUBDIR
+  REPO2=$(echo $REPO | sed 's%^ssh://%%g' | sed 's%:/%/%g')
+  DOMAIN=$(echo $REPO2 | awk -F'[@/]' '{print $2}' | sed 's/\.git\./\./g')
+  SUBDIR=$(echo $REPO2 | awk -F'[@/]' '{print $3"/"$4}')
+  BASEURL=https://$DOMAIN/git/$SUBDIR
 fi
 
 URL=$BASEURL/pullRequests/add/master...$BRANCH
