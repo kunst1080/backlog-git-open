@@ -6,7 +6,7 @@ REPO=$(git config --get remote.origin.url | sed 's/\.git$//g')
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 WORKDIR=$(git rev-parse --show-prefix | sed 's%\/$%%g')
 
-if ! echo $REPO | grep -E -q "backlog.jp:|backlog.jp:" ; then
+if ! echo $REPO | grep -E -q "backlog.(jp|com)(:|/)" ; then
   exit 1
 fi
 
